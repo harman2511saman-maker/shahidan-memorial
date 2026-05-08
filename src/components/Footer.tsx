@@ -1,5 +1,5 @@
 import Link from 'next/link';
-import { Heart } from 'lucide-react';
+import { Heart, MessageCircle } from 'lucide-react';
 
 const Footer = () => {
   return (
@@ -8,11 +8,8 @@ const Footer = () => {
         <div className="grid grid-cols-1 md:grid-cols-4 gap-8">
           <div className="col-span-1 md:col-span-2">
             <Link href="/" className="flex items-center gap-2 mb-4">
-              <div className="w-8 h-8 rounded-full bg-brand-red flex items-center justify-center text-white font-bold">
-                ش
-              </div>
               <span className="font-outfit font-bold text-xl tracking-tight text-white">
-                یادگاری شەهیدان
+                یادگاری <span className="text-brand-red">شەهیدان</span>
               </span>
             </Link>
             <p className="text-gray-400 max-w-sm">
@@ -32,12 +29,17 @@ const Footer = () => {
           <div>
             <h4 className="text-white font-bold mb-4">پەیوەندی</h4>
             <ul className="space-y-2 text-gray-400">
-              <li>info@shahidan.krd</li>
-              <li>سلێمانی، هەرێمی کوردستان</li>
+              <li>هەولێر، هەرێمی کوردستان</li>
               <li className="pt-4 flex gap-4">
-                <a href="#" className="w-8 h-8 rounded-full bg-white/10 flex items-center justify-center hover:bg-brand-red transition-colors text-white">f</a>
-                <a href="#" className="w-8 h-8 rounded-full bg-white/10 flex items-center justify-center hover:bg-brand-red transition-colors text-white">t</a>
-                <a href="#" className="w-8 h-8 rounded-full bg-white/10 flex items-center justify-center hover:bg-brand-red transition-colors text-white">i</a>
+                <a 
+                  href="https://wa.me/9647508433534" 
+                  target="_blank" 
+                  rel="noopener noreferrer"
+                  className="flex items-center gap-2 bg-green-600/10 text-green-500 px-4 py-2 rounded-xl border border-green-600/20 hover:bg-green-600 hover:text-white transition-all"
+                >
+                  <MessageCircle size={20} />
+                  <span className="font-bold">وەتسئاپ</span>
+                </a>
               </li>
             </ul>
           </div>
