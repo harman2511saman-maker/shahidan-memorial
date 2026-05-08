@@ -17,7 +17,7 @@ const AddMartyr = () => {
   // Form State
   const [formData, setFormData] = useState({
     full_name: '',
-    father_name: '',
+    father_name: '', // This will store Martyr Alias (نازناو)
     birth_year: '',
     gender: 'نێر',
     organization: 'پێشمەرگە',
@@ -176,8 +176,8 @@ const AddMartyr = () => {
                     <input name="full_name" value={formData.full_name} onChange={handleInputChange} type="text" placeholder="بۆ نموونە: ئازاد بەراکە ئەحمەد" className="w-full bg-background border border-border p-4 rounded-xl focus:ring-2 focus:ring-brand-red/50 outline-none" required />
                   </div>
                   <div className="space-y-2">
-                    <label className="text-sm font-bold text-foreground/70">ناوی باوک</label>
-                    <input name="father_name" value={formData.father_name} onChange={handleInputChange} type="text" placeholder="ناوی باوکی شەهید" className="w-full bg-background border border-border p-4 rounded-xl focus:ring-2 focus:ring-brand-red/50 outline-none" required />
+                    <label className="text-sm font-bold text-foreground/70">نازناوی شەهید</label>
+                    <input name="father_name" value={formData.father_name} onChange={handleInputChange} type="text" placeholder="بۆ نموونە: شێری کوردستان" className="w-full bg-background border border-border p-4 rounded-xl focus:ring-2 focus:ring-brand-red/50 outline-none" />
                   </div>
                   <div className="space-y-2">
                     <label className="text-sm font-bold text-foreground/70">ساڵی لەدایکبوون</label>
