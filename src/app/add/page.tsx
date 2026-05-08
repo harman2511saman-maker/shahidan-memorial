@@ -98,9 +98,9 @@ const AddMartyr = () => {
       if (insertError) throw insertError;
 
       setIsSubmitted(true);
-    } catch (error) {
+    } catch (error: any) {
       console.error('Error submitting:', error);
-      alert('هەڵەیەک ڕوویدا لە کاتی ناردنی زانیارییەکان. تکایە دووبارە هەوڵ بدەرەوە.');
+      alert(`هەڵەیەک ڕوویدا: ${error.message || 'نەزانراو'}`);
     } finally {
       setLoading(false);
     }

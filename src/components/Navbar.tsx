@@ -31,9 +31,6 @@ const Navbar = () => {
       <div className="container mx-auto px-4 flex justify-between items-center">
         {/* Logo */}
         <Link href="/" className="flex items-center gap-2 group">
-          <div className="w-10 h-10 rounded-full bg-brand-red flex items-center justify-center text-white font-bold text-xl shadow-lg shadow-brand-red/20 group-hover:scale-110 transition-transform">
-            ش
-          </div>
           <span className="font-outfit font-bold text-xl tracking-tight hidden sm:block">
             یادگاری <span className="text-brand-red">شەهیدان</span>
           </span>
@@ -66,9 +63,6 @@ const Navbar = () => {
             <span>زیادکردن</span>
           </Link>
 
-          <Link href="/login" className="p-2 rounded-full hover:bg-foreground/5 transition-colors">
-            <User size={20} />
-          </Link>
 
           <button 
             className="md:hidden p-2"

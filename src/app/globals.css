@@ -2,7 +2,8 @@
 
 @theme {
   --color-brand-red: #EE332E;
-  --color-brand-green: #27AE60;
+  --color-brand-green: #FBCB06;
+  --color-brand-green-hover: #eab308;
   --color-brand-yellow: #FBCB06;
   --color-dark-surface: #0F1117;
   --color-dark-card: #1E2129;
@@ -13,7 +14,7 @@
   --color-border: var(--border);
   --color-card: var(--card);
   
-  --font-kurdish: "Inter", "Vazirmatn", sans-serif;
+  --font-kurdish: var(--font-alexandria), "Inter", sans-serif;
 }
 
 :root {
@@ -34,12 +35,17 @@ body {
   background: var(--background);
   color: var(--foreground);
   font-family: var(--font-kurdish);
+  font-weight: 500; /* Increased from default */
   transition: background-color 0.3s, color 0.3s;
 }
 
 @layer base {
   * {
     border-color: var(--border);
+    font-weight: 600 !important;
+  }
+  h1, h2, h3, h4, h5, h6 {
+    font-weight: 800 !important;
   }
 }
 

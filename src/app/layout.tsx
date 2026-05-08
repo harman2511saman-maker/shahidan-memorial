@@ -1,17 +1,20 @@
 import type { Metadata } from "next";
-import { Inter, Outfit } from "next/font/google";
+import { Inter, Alexandria } from "next/font/google";
 import "./globals.css";
 import { ThemeProvider } from "../components/ThemeProvider";
 import Navbar from "../components/Navbar";
 import Footer from "../components/Footer";
 
 const inter = Inter({ subsets: ["latin"], variable: "--font-inter" });
-const outfit = Outfit({ subsets: ["latin"], variable: "--font-outfit" });
+const alexandria = Alexandria({ 
+  subsets: ["arabic", "latin"], 
+  weight: ["300", "400", "500", "600", "700", "800"],
+  variable: "--font-alexandria" 
+});
 
 export const metadata: Metadata = {
   title: "یادگاری شەهیدان | Memorial of Kurdish Martyrs",
-  description: "پلاتفۆرمی یادکردنەوەی شەهیدانی کوردستان. پاراستنی مێژوو و قوربانیدانی قارەمانەکانمان.",
-  keywords: "شەهید, کوردستان, پێشمەرگە, ئاسایش, یادگاری, Martyrs, Kurdistan, Peshmerga",
+  description: "گەورەترین پلاتفۆرم بۆ یادکردنەوەی شەهیدانی کوردستان",
 };
 
 export default function RootLayout({
@@ -20,8 +23,8 @@ export default function RootLayout({
   children: React.ReactNode;
 }>) {
   return (
-    <html lang="ckb" dir="rtl" suppressHydrationWarning>
-      <body className={`${inter.variable} ${outfit.variable} antialiased selection:bg-brand-red selection:text-white`}>
+    <html lang="ku" dir="rtl" suppressHydrationWarning>
+      <body className={`${inter.variable} ${alexandria.variable} antialiased font-kurdish selection:bg-brand-red selection:text-white`}>
         <ThemeProvider>
           <div className="flex flex-col min-h-screen">
             <Navbar />

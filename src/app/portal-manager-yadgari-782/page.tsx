@@ -1,27 +1,40 @@
 'use client';
 
 import { useState, useEffect } from 'react';
-import { motion } from 'framer-motion';
+import { motion, AnimatePresence } from 'framer-motion';
 import { 
   Users, FileText, Check, X, Edit, 
-  Trash2, ShieldCheck, BarChart3, Settings, Loader2
+  Trash2, ShieldCheck, BarChart3, Settings, Loader2, Save
 } from 'lucide-react';
 import { supabase } from '@/lib/supabase';
+import { useRouter } from 'next/navigation';
 
 const AdminDashboard = () => {
+  const router = useRouter();
   const [activeTab, setActiveTab] = useState('submissions');
   const [martyrs, setMartyrs] = useState<any[]>([]);
   const [loading, setLoading] = useState(true);
+  const [editingId, setEditingId] = useState<string | null>(null);
+  const [editForm, setEditForm] = useState<any>({});
+  
   const [stats, setStats] = useState({
     total: 0,
     pending: 0,
-    users: 0,
-    views: '١,٢٠٠'
+    users: 2,
+    views: '٧٦٨'
   });
 
   useEffect(() => {
+    checkUser();
     fetchMartyrs();
   }, []);
+
+  const checkUser = async () => {
+    const { data: { session } } = await supabase.auth.getSession();
+    if (!session) {
+      router.push('/login');
+    }
+  };
 
   const fetchMartyrs = async () => {
     setLoading(true);
@@ -34,7 +47,6 @@ const AdminDashboard = () => {
       if (error) throw error;
       setMartyrs(data || []);
       
-      // Calculate stats
       const total = data?.filter(m => m.is_approved).length || 0;
       const pending = data?.filter(m => !m.is_approved).length || 0;
       setStats(prev => ({ ...prev, total, pending }));
@@ -54,7 +66,7 @@ const AdminDashboard = () => {
         .eq('id', id);
 
       if (error) throw error;
-      fetchMartyrs(); // Refresh
+      fetchMartyrs();
     } catch (error) {
       alert('هەڵەیەک ڕوویدا');
     }
@@ -69,9 +81,34 @@ const AdminDashboard = () => {
         .eq('id', id);
 
       if (error) throw error;
-      fetchMartyrs(); // Refresh
+      fetchMartyrs();
     } catch (error) {
       alert('هەڵەیەک ڕوویدا');
+    }
+  };
+
+  const startEditing = (martyr: any) => {
+    setEditingId(martyr.id);
+    setEditForm(martyr);
+  };
+
+  const handleUpdate = async () => {
+    try {
+      const { error } = await supabase
+        .from('martyrs')
+        .update({
+          full_name: editForm.full_name,
+          martyrdom_location: editForm.martyrdom_location,
+          organization: editForm.organization,
+          rank: editForm.rank
+        })
+        .eq('id', editingId);
+
+      if (error) throw error;
+      setEditingId(null);
+      fetchMartyrs();
+    } catch (error) {
+      alert('هەڵەیەک ڕوویدا لە کاتی نوێکردنەوە');
     }
   };
 
@@ -82,14 +119,21 @@ const AdminDashboard = () => {
   return (
     <div className="min-h-screen bg-background pt-32 pb-20">
       <div className="container mx-auto px-4">
+        {/* Header */}
         <div className="flex flex-col md:flex-row justify-between items-start md:items-center mb-12 gap-6">
           <div>
             <h1 className="text-4xl font-bold mb-2">تەختەی کۆنتڕۆڵ</h1>
             <p className="text-foreground/50">بەڕێوەبردنی پلاتفۆرمی یادگاری شەهیدان</p>
           </div>
           <div className="flex gap-4">
-            <button className="bg-card border border-border p-3 rounded-xl hover:bg-foreground/5 transition-colors">
-              <Settings size={20} />
+            <button 
+              onClick={async () => {
+                await supabase.auth.signOut();
+                router.push('/login');
+              }}
+              className="px-4 py-2 bg-brand-red/10 text-brand-red rounded-xl font-bold hover:bg-brand-red hover:text-white transition-all"
+            >
+              چوونەدەرەوە
             </button>
             <div className="flex items-center gap-3 bg-brand-green/10 text-brand-green px-4 py-2 rounded-xl border border-brand-green/20">
               <ShieldCheck size={20} />
@@ -116,7 +160,7 @@ const AdminDashboard = () => {
               </div>
             </div>
             <div className="text-3xl font-bold mb-1">{stats.pending}</div>
-            <div className="text-foreground/50 text-sm font-medium">نوێترین داواکاری</div>
+            <div className="text-foreground/50 text-sm font-medium">داواکاری نوێ</div>
           </div>
           <div className="bg-card border border-border p-6 rounded-3xl">
             <div className="flex justify-between items-start mb-4">
@@ -125,7 +169,7 @@ const AdminDashboard = () => {
               </div>
             </div>
             <div className="text-3xl font-bold mb-1">{stats.users}</div>
-            <div className="text-foreground/50 text-sm font-medium">بەکارهێنەران</div>
+            <div className="text-foreground/50 text-sm font-medium">بەڕێوەبەران</div>
           </div>
           <div className="bg-card border border-border p-6 rounded-3xl">
             <div className="flex justify-between items-start mb-4">
@@ -165,8 +209,8 @@ const AdminDashboard = () => {
 
           {/* Main Content */}
           <div className="flex-grow">
-            <div className="bg-card border border-border rounded-3xl overflow-hidden">
-              <div className="p-6 border-b border-border flex justify-between items-center">
+            <div className="bg-card border border-border rounded-3xl overflow-hidden shadow-sm">
+              <div className="p-6 border-b border-border flex justify-between items-center bg-foreground/[0.02]">
                 <h3 className="text-xl font-bold">
                   {activeTab === 'submissions' ? 'داواکارییە نوێیەکان' : 'لیستی شەهیدەکان'}
                 </h3>
@@ -179,43 +223,98 @@ const AdminDashboard = () => {
               ) : (
                 <div className="overflow-x-auto">
                   <table className="w-full text-right">
-                    <thead className="bg-foreground/5 text-foreground/50 text-sm">
+                    <thead className="bg-foreground/5 text-foreground/50 text-xs uppercase tracking-wider">
                       <tr>
-                        <th className="px-6 py-4 font-bold">ناو</th>
+                        <th className="px-6 py-4 font-bold">زانیاری شەهید</th>
+                        <th className="px-6 py-4 font-bold">ڕێکخراو / پلە</th>
                         <th className="px-6 py-4 font-bold">شوێن</th>
-                        <th className="px-6 py-4 font-bold">بەروار</th>
                         <th className="px-6 py-4 font-bold">کردارەکان</th>
                       </tr>
                     </thead>
                     <tbody className="divide-y divide-border">
                       {filteredMartyrs.map((item) => (
-                        <tr key={item.id} className="hover:bg-foreground/5 transition-colors">
-                          <td className="px-6 py-4 font-bold">
+                        <tr key={item.id} className="hover:bg-foreground/[0.02] transition-colors">
+                          <td className="px-6 py-4">
                             <div className="flex items-center gap-3">
-                              <div className="w-10 h-10 rounded-full overflow-hidden">
+                              <div className="w-12 h-12 rounded-full overflow-hidden border border-border shrink-0">
                                 <img src={item.photo_url} alt="" className="w-full h-full object-cover" />
                               </div>
-                              {item.full_name}
+                              <div>
+                                {editingId === item.id ? (
+                                  <input 
+                                    value={editForm.full_name || ''} 
+                                    onChange={(e) => setEditForm({...editForm, full_name: e.target.value})}
+                                    className="bg-background border border-border px-2 py-1 rounded text-sm w-full"
+                                  />
+                                ) : (
+                                  <div className="font-bold text-foreground">{item.full_name}</div>
+                                )}
+                                <div className="text-xs text-foreground/40">{new Date(item.created_at).toLocaleDateString('ku-IQ')}</div>
+                              </div>
                             </div>
                           </td>
-                          <td className="px-6 py-4">{item.martyrdom_location}</td>
-                          <td className="px-6 py-4 text-sm text-foreground/50">
-                            {new Date(item.created_at).toLocaleDateString('ku-IQ')}
+                          <td className="px-6 py-4">
+                            {editingId === item.id ? (
+                              <div className="space-y-1">
+                                <input 
+                                  value={editForm.organization || ''} 
+                                  onChange={(e) => setEditForm({...editForm, organization: e.target.value})}
+                                  className="bg-background border border-border px-2 py-1 rounded text-xs w-full"
+                                />
+                                <input 
+                                  value={editForm.rank || ''} 
+                                  onChange={(e) => setEditForm({...editForm, rank: e.target.value})}
+                                  className="bg-background border border-border px-2 py-1 rounded text-xs w-full"
+                                />
+                              </div>
+                            ) : (
+                              <div className="space-y-1">
+                                <div className="text-sm font-medium">{item.organization}</div>
+                                <div className="text-xs text-foreground/50">{item.rank || 'پێشمەرگە'}</div>
+                              </div>
+                            )}
+                          </td>
+                          <td className="px-6 py-4 text-sm">
+                            {editingId === item.id ? (
+                              <input 
+                                value={editForm.martyrdom_location || ''} 
+                                onChange={(e) => setEditForm({...editForm, martyrdom_location: e.target.value})}
+                                className="bg-background border border-border px-2 py-1 rounded text-xs w-full"
+                              />
+                            ) : (
+                              item.martyrdom_location
+                            )}
                           </td>
                           <td className="px-6 py-4">
                             <div className="flex gap-2">
-                              {!item.is_approved && (
+                              {editingId === item.id ? (
                                 <button 
-                                  onClick={() => handleApprove(item.id)}
-                                  className="p-2 bg-brand-green/10 text-brand-green rounded-lg hover:bg-brand-green/20 transition-colors"
-                                  title="قبوڵکردن"
+                                  onClick={handleUpdate}
+                                  className="p-2 bg-brand-green text-white rounded-lg hover:opacity-90 transition-opacity"
+                                  title="پاشەکەوتکردن"
                                 >
-                                  <Check size={18} />
+                                  <Save size={18} />
                                 </button>
+                              ) : (
+                                <>
+                                  {!item.is_approved && (
+                                    <button 
+                                      onClick={() => handleApprove(item.id)}
+                                      className="p-2 bg-brand-green/10 text-brand-green rounded-lg hover:bg-brand-green/20 transition-colors"
+                                      title="قبوڵکردن"
+                                    >
+                                      <Check size={18} />
+                                    </button>
+                                  )}
+                                  <button 
+                                    onClick={() => startEditing(item)}
+                                    className="p-2 bg-blue-500/10 text-blue-500 rounded-lg hover:bg-blue-500/20 transition-colors"
+                                    title="دەستکاریکردن"
+                                  >
+                                    <Edit size={18} />
+                                  </button>
+                                </>
                               )}
-                              <button className="p-2 bg-blue-500/10 text-blue-500 rounded-lg hover:bg-blue-500/20 transition-colors">
-                                <Edit size={18} />
-                              </button>
                               <button 
                                 onClick={() => handleDelete(item.id)}
                                 className="p-2 bg-brand-red/10 text-brand-red rounded-lg hover:bg-brand-red/20 transition-colors"
@@ -235,7 +334,7 @@ const AdminDashboard = () => {
               {!loading && filteredMartyrs.length === 0 && (
                 <div className="p-20 text-center text-foreground/30">
                   <FileText size={64} className="mx-auto mb-4 opacity-10" />
-                  <p>هیچ زانیارییەک نییە</p>
+                  <p className="text-lg">هیچ زانیارییەک نەدۆزرایەوە</p>
                 </div>
               )}
             </div>

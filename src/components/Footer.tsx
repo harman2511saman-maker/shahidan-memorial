@@ -26,7 +26,6 @@ const Footer = () => {
               <li><Link href="/" className="hover:text-brand-green transition-colors">سەرەتا</Link></li>
               <li><Link href="/martyrs" className="hover:text-brand-green transition-colors">لیستی شەهیدان</Link></li>
               <li><Link href="/stats" className="hover:text-brand-green transition-colors">ئامارەکان</Link></li>
-              <li><Link href="/privacy" className="hover:text-brand-green transition-colors">پاراستنی زانیارییەکان</Link></li>
             </ul>
           </div>
 

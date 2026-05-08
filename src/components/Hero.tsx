@@ -6,14 +6,14 @@ import { Search } from 'lucide-react';
 const Hero = () => {
   return (
     <section className="relative h-[80vh] flex items-center justify-center overflow-hidden">
-      {/* Background with Overlay */}
-      <div className="absolute inset-0 z-0">
+      {/* Background with Overlay using CSS for better stability */}
+      <div 
+        className="absolute inset-0 z-0 bg-cover bg-center"
+        style={{ 
+          backgroundImage: `url('https://images.unsplash.com/photo-1541414779247-5df736565701?q=80&w=2000&auto=format&fit=crop')`,
+        }}
+      >
         <div className="absolute inset-0 bg-gradient-to-b from-black/70 via-black/40 to-background z-10" />
-        <img 
-          src="https://images.unsplash.com/photo-1541414779247-5df736565701?q=80&w=2000&auto=format&fit=crop" 
-          alt="Kurdistan Mountains" 
-          className="w-full h-full object-cover"
-        />
       </div>
 
       <div className="container mx-auto px-4 relative z-20 text-center">
@@ -25,7 +25,7 @@ const Hero = () => {
           <span className="inline-block px-4 py-1 rounded-full bg-brand-red/20 text-brand-red font-bold text-sm mb-6 border border-brand-red/30 backdrop-blur-sm">
             بۆ یادی شەهیدانمان
           </span>
-          <h1 className="text-4xl md:text-7xl font-bold text-white mb-6 leading-tight">
+          <h1 className="text-4xl md:text-7xl font-bold text-white mb-6 leading-tight font-kurdish">
             نەمرن ئەوانەی <br />
             <span className="text-brand-green">لە پێناو خاکدا</span> گیان دەسپێرن
           </h1>

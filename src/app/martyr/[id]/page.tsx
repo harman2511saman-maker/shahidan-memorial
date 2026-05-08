@@ -4,7 +4,7 @@ import { useParams } from 'next/navigation';
 import { motion } from 'framer-motion';
 import { 
   Calendar, MapPin, Award, History, Heart, Share2, 
-  Info, Image as ImageIcon, Loader2 
+  Info, Image as ImageIcon, Loader2, ChevronRight
 } from 'lucide-react';
 import { useState, useEffect } from 'react';
 import { supabase } from '@/lib/supabase';
@@ -13,7 +13,6 @@ const MartyrProfile = () => {
   const params = useParams();
   const [martyr, setMartyr] = useState<any>(null);
   const [loading, setLoading] = useState(true);
-  const [likes, setLikes] = useState(124);
   const [isLiked, setIsLiked] = useState(false);
 
   useEffect(() => {
@@ -33,16 +32,31 @@ const MartyrProfile = () => {
 
       if (error) throw error;
       setMartyr(data);
-    } catch (error) {
-      console.error('Error:', error);
+    } catch (error: any) {
+      console.error('Error fetching martyr:', error.message);
     } finally {
       setLoading(false);
     }
   };
 
-  const toggleLike = () => {
-    setIsLiked(!isLiked);
-    setLikes(prev => isLiked ? prev - 1 : prev + 1);
+  const toggleLike = async () => {
+    if (isLiked) return; // Prevent multiple likes in one session easily
+    
+    setIsLiked(true);
+    try {
+      const { data, error } = await supabase
+        .from('martyrs')
+        .update({ candles_count: (martyr.candles_count || 0) + 1 })
+        .eq('id', martyr.id)
+        .select()
+        .single();
+
+      if (error) throw error;
+      setMartyr(data);
+    } catch (error) {
+      console.error('Error updating likes:', error);
+      setIsLiked(false);
+    }
   };
 
   if (loading) {
@@ -55,139 +69,144 @@ const MartyrProfile = () => {
 
   if (!martyr) {
     return (
-      <div className="min-h-screen flex items-center justify-center">
-        <h2 className="text-2xl font-bold">ببوورە، ئەم زانیارییە نەدۆزرایەوە</h2>
+      <div className="min-h-screen flex flex-col items-center justify-center p-4">
+        <h2 className="text-3xl font-bold mb-4">ببوورە، ئەم زانیارییە نەدۆزرایەوە</h2>
+        <button onClick={() => window.location.href = '/'} className="bg-brand-red text-white px-8 py-3 rounded-2xl font-bold">گەڕانەوە</button>
       </div>
     );
   }
 
   return (
-    <div className="min-h-screen bg-background pt-24">
-      {/* Header / Hero Section */}
-      <section className="relative h-[60vh] overflow-hidden">
-        <div className="absolute inset-0 bg-gradient-to-b from-black/60 via-black/40 to-background z-10" />
+    <div className="min-h-screen bg-background pb-20">
+      {/* Dynamic Background Banner */}
+      <div className="relative h-[50vh] w-full overflow-hidden">
+        <div className="absolute inset-0 bg-gradient-to-t from-background via-background/40 to-transparent z-10" />
         <img 
           src={martyr.photo_url} 
-          alt={martyr.full_name}
-          className="w-full h-full object-cover grayscale-[30%] blur-[2px]"
+          alt="" 
+          className="w-full h-full object-cover scale-110 blur-xl opacity-30"
         />
         
-        <div className="container mx-auto px-4 relative z-20 h-full flex flex-col justify-end pb-12">
-          <motion.div
-            initial={{ opacity: 0, x: 50 }}
-            animate={{ opacity: 1, x: 0 }}
-            className="flex flex-col md:flex-row items-end gap-8"
+        <div className="absolute inset-0 flex items-center justify-center z-20 pt-20">
+          <motion.div 
+            initial={{ opacity: 0, scale: 0.8 }}
+            animate={{ opacity: 1, scale: 1 }}
+            className="w-64 h-80 md:w-80 md:h-96 rounded-[2.5rem] overflow-hidden border-8 border-card shadow-2xl rotate-3"
           >
-            <div className="w-48 h-64 md:w-64 md:h-80 rounded-2xl overflow-hidden border-4 border-white/10 shadow-2xl shrink-0">
-              <img src={martyr.photo_url} alt={martyr.full_name} className="w-full h-full object-cover" />
-            </div>
-            
-            <div className="mb-4">
-              <div className="flex items-center gap-3 mb-4">
-                <span className="bg-brand-red text-white px-4 py-1 rounded-full text-sm font-bold">
-                  {martyr.organization || 'پێشمەرگە'}
+            <img src={martyr.photo_url} alt={martyr.full_name} className="w-full h-full object-cover" />
+          </motion.div>
+        </div>
+      </div>
+
+      <div className="container mx-auto px-4 -mt-10 relative z-30">
+        <div className="max-w-5xl mx-auto">
+          {/* Header Info */}
+          <div className="text-center mb-16">
+            <motion.div
+              initial={{ opacity: 0, y: 20 }}
+              animate={{ opacity: 1, y: 0 }}
+            >
+              <div className="flex items-center justify-center gap-3 mb-6">
+                <span className="bg-brand-red text-white px-6 py-1.5 rounded-full text-sm font-bold shadow-lg shadow-brand-red/20">
+                  {martyr.organization}
                 </span>
-                <span className="bg-white/10 backdrop-blur-md text-white px-4 py-1 rounded-full text-sm">
+                <span className="bg-brand-green/10 text-brand-green border border-brand-green/20 px-6 py-1.5 rounded-full text-sm font-bold">
                   {martyr.rank || 'پێشمەرگە'}
                 </span>
               </div>
-              <h1 className="text-4xl md:text-6xl font-bold text-white mb-2">{martyr.full_name}</h1>
-              <p className="text-white/70 text-xl font-medium">کوری {martyr.father_name}</p>
-            </div>
-          </motion.div>
-        </div>
-      </section>
-
-      <div className="container mx-auto px-4 py-12">
-        <div className="grid grid-cols-1 lg:grid-cols-3 gap-12">
-          {/* Main Info */}
-          <div className="lg:col-span-2 space-y-12">
-            {/* Biography */}
-            <motion.section 
-              initial={{ opacity: 0, y: 20 }}
-              whileInView={{ opacity: 1, y: 0 }}
-              viewport={{ once: true }}
-              className="bg-card border border-border p-8 rounded-3xl"
-            >
-              <div className="flex items-center gap-3 mb-6">
-                <div className="p-2 bg-brand-green/10 rounded-lg text-brand-green">
-                  <Info size={24} />
-                </div>
-                <h2 className="text-2xl font-bold">کورەی ژیان و خەبات</h2>
-              </div>
-              <p className="text-foreground/80 text-lg leading-loose whitespace-pre-line">
-                {martyr.biography}
-              </p>
-            </motion.section>
-
-            {/* Gallery (Placeholder if no real gallery table implementation yet) */}
-            <motion.section 
-              initial={{ opacity: 0, y: 20 }}
-              whileInView={{ opacity: 1, y: 0 }}
-              viewport={{ once: true }}
-              className="bg-card border border-border p-8 rounded-3xl"
-            >
-              <div className="flex items-center justify-between mb-8">
-                <div className="flex items-center gap-3">
-                  <div className="p-2 bg-brand-yellow/10 rounded-lg text-brand-yellow">
-                    <ImageIcon size={24} />
-                  </div>
-                  <h2 className="text-2xl font-bold">ئەلبومی وێنەکان</h2>
-                </div>
-              </div>
-              <div className="grid grid-cols-2 md:grid-cols-3 gap-4">
-                <div className="aspect-square rounded-2xl overflow-hidden cursor-pointer hover:opacity-80 transition-opacity">
-                  <img src={martyr.photo_url} alt="Gallery" className="w-full h-full object-cover" />
-                </div>
-              </div>
-            </motion.section>
+              <h1 className="text-5xl md:text-7xl font-bold mb-4">{martyr.full_name}</h1>
+              <p className="text-foreground/40 text-2xl font-medium">کوری {martyr.father_name}</p>
+            </motion.div>
           </div>
 
-          {/* Sidebar Stats */}
-          <div className="space-y-6">
-            <div className="bg-card border border-border p-8 rounded-3xl sticky top-28">
-              <div className="space-y-6">
-                <div className="flex justify-between items-center pb-4 border-b border-border">
-                  <span className="text-foreground/50 flex items-center gap-2">
-                    <Calendar size={18} /> ساڵی لەدایکبوون
-                  </span>
-                  <span className="font-bold text-lg">{martyr.birth_year}</span>
+          <div className="grid grid-cols-1 lg:grid-cols-12 gap-12">
+            {/* Left Column: Details */}
+            <div className="lg:col-span-8 space-y-10">
+              <section className="bg-card border border-border p-10 rounded-[3rem] shadow-sm relative overflow-hidden">
+                <div className="absolute top-0 right-0 w-32 h-32 bg-brand-green/5 rounded-full -mr-16 -mt-16 blur-3xl" />
+                <h2 className="text-2xl font-bold mb-8 flex items-center gap-3">
+                  <div className="w-10 h-10 rounded-2xl bg-brand-green/10 flex items-center justify-center text-brand-green">
+                    <Info size={20} />
+                  </div>
+                  کورەی ژیان و خەبات
+                </h2>
+                <div className="text-foreground/70 text-xl leading-[2.2] whitespace-pre-line text-justify">
+                  {martyr.biography || 'زانیاری دەربارەی ژیاننامەی ئەم شەهیدە هێشتا زیاد نەکراوە.'}
                 </div>
-                <div className="flex justify-between items-center pb-4 border-b border-border">
-                  <span className="text-foreground/50 flex items-center gap-2">
-                    <Calendar size={18} className="text-brand-red" /> ساڵی شەهیدبوون
-                  </span>
-                  <span className="font-bold text-lg text-brand-red">{martyr.martyrdom_year}</span>
-                </div>
-                <div className="flex justify-between items-center pb-4 border-b border-border">
-                  <span className="text-foreground/50 flex items-center gap-2">
-                    <Award size={18} className="text-brand-yellow" /> تەمەنی شەهیدبوون
-                  </span>
-                  <span className="font-bold text-lg">{martyr.martyrdom_year - martyr.birth_year} ساڵ</span>
-                </div>
-                <div className="flex justify-between items-center pb-4 border-b border-border">
-                  <span className="text-foreground/50 flex items-center gap-2">
-                    <MapPin size={18} className="text-brand-green" /> شوێنی شەهیدبوون
-                  </span>
-                  <span className="font-bold text-lg text-left">{martyr.martyrdom_location}</span>
-                </div>
-              </div>
+              </section>
 
-              <div className="mt-10 flex gap-4">
-                <button 
-                  onClick={toggleLike}
-                  className={`flex-1 flex items-center justify-center gap-3 py-4 rounded-2xl font-bold transition-all ${
-                    isLiked 
-                      ? 'bg-brand-red text-white shadow-lg shadow-brand-red/20' 
-                      : 'bg-foreground/5 hover:bg-brand-red/10 text-brand-red'
-                  }`}
-                >
-                  <Heart size={20} fill={isLiked ? "currentColor" : "none"} />
-                  <span>داگیرساندنی مۆم ({likes})</span>
-                </button>
-                <button className="p-4 bg-foreground/5 rounded-2xl hover:bg-foreground/10 transition-colors">
-                  <Share2 size={20} />
-                </button>
+              {/* Battles / History */}
+              <section className="bg-card border border-border p-10 rounded-[3rem] shadow-sm">
+                <h2 className="text-2xl font-bold mb-8 flex items-center gap-3">
+                  <div className="w-10 h-10 rounded-2xl bg-brand-red/10 flex items-center justify-center text-brand-red">
+                    <History size={20} />
+                  </div>
+                  داستانەکان و بەشدارییەکان
+                </h2>
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                  {(martyr.battles || 'بەشداری لە چەندین شەڕ و داستانی نەتەوەییدا کردووە').split('،').map((battle: string, i: number) => (
+                    <div key={i} className="flex items-center gap-4 bg-foreground/[0.03] p-5 rounded-2xl border border-border/50">
+                      <ChevronRight className="text-brand-red" size={20} />
+                      <span className="font-bold">{battle.trim()}</span>
+                    </div>
+                  ))}
+                </div>
+              </section>
+            </div>
+
+            {/* Right Column: Stats & Actions */}
+            <div className="lg:col-span-4 space-y-8">
+              <div className="bg-card border border-border p-8 rounded-[3rem] shadow-xl sticky top-28">
+                <div className="space-y-8 mb-10">
+                  <div className="flex items-center gap-5">
+                    <div className="w-14 h-14 rounded-2xl bg-brand-red/10 flex items-center justify-center text-brand-red shrink-0">
+                      <Calendar size={28} />
+                    </div>
+                    <div>
+                      <div className="text-sm text-foreground/40 font-bold uppercase tracking-wider">ساڵی لەدایکبوون</div>
+                      <div className="text-2xl font-bold">{martyr.birth_year}</div>
+                    </div>
+                  </div>
+
+                  <div className="flex items-center gap-5">
+                    <div className="w-14 h-14 rounded-2xl bg-brand-green/10 flex items-center justify-center text-brand-green shrink-0">
+                      <Award size={28} />
+                    </div>
+                    <div>
+                      <div className="text-sm text-foreground/40 font-bold uppercase tracking-wider">ساڵی شەهیدبوون</div>
+                      <div className="text-2xl font-bold">{martyr.martyrdom_year}</div>
+                    </div>
+                  </div>
+
+                  <div className="flex items-center gap-5">
+                    <div className="w-14 h-14 rounded-2xl bg-brand-yellow/10 flex items-center justify-center text-brand-yellow shrink-0">
+                      <MapPin size={28} />
+                    </div>
+                    <div>
+                      <div className="text-sm text-foreground/40 font-bold uppercase tracking-wider">شوێنی شەهیدبوون</div>
+                      <div className="text-2xl font-bold">{martyr.martyrdom_location}</div>
+                    </div>
+                  </div>
+                </div>
+
+                <div className="flex flex-col gap-4">
+                  <button 
+                    onClick={toggleLike}
+                    className={`group w-full flex items-center justify-center gap-4 py-6 rounded-[2rem] font-bold text-xl transition-all duration-500 ${
+                      isLiked 
+                        ? 'bg-brand-red text-white shadow-2xl shadow-brand-red/30 scale-[1.02]' 
+                        : 'bg-foreground/5 hover:bg-brand-red/10 text-brand-red'
+                    }`}
+                  >
+                    <Heart size={28} fill={isLiked ? "currentColor" : "none"} className={isLiked ? "animate-pulse" : ""} />
+                    <span>داگیرساندنی مۆم ({martyr.candles_count || 0})</span>
+                  </button>
+                  
+                  <button className="w-full flex items-center justify-center gap-3 py-4 rounded-2xl text-foreground/40 font-bold hover:bg-foreground/5 transition-all">
+                    <Share2 size={20} />
+                    <span>بڵاوکردنەوەی پرۆفایل</span>
+                  </button>
+                </div>
               </div>
             </div>
           </div>

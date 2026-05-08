@@ -126,16 +126,16 @@ export default function Home() {
           
           <div className="relative z-10 grid grid-cols-1 md:grid-cols-3 gap-12 text-center">
             <div>
-              <div className="text-5xl font-bold text-brand-green mb-2">+{martyrs.length}</div>
-              <div className="text-lg text-foreground/60">شەهیدی تۆمارکراو</div>
+              <div className="text-5xl font-bold text-brand-green mb-2">{martyrs.length}+</div>
+              <div className="text-lg text-foreground/60 font-bold">شەهیدی تۆمارکراو</div>
             </div>
             <div>
-              <div className="text-5xl font-bold text-brand-red mb-2">+٤٥٠</div>
-              <div className="text-lg text-foreground/60">داستانی قارەمانانە</div>
+              <div className="text-5xl font-bold text-brand-red mb-2">٢٥+</div>
+              <div className="text-lg text-foreground/60 font-bold">داستانی قارەمانانە</div>
             </div>
             <div>
-              <div className="text-5xl font-bold text-brand-yellow mb-2">+٥٠,٠٠٠</div>
-              <div className="text-lg text-foreground/60">وێنە و بەڵگەنامە</div>
+              <div className="text-5xl font-bold text-brand-yellow mb-2">{martyrs.length}+</div>
+              <div className="text-lg text-foreground/60 font-bold">وێنە و بەڵگەنامە</div>
             </div>
           </div>
         </div>
