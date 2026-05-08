@@ -26,7 +26,7 @@ const LoginPage = () => {
 
       if (error) throw error;
       
-      router.push('/admin');
+      router.push('/portal-manager-yadgari-782');
     } catch (err: any) {
       setError('ئیمەیڵ یان پاسوۆردەکە هەڵەیە!');
       console.error(err);

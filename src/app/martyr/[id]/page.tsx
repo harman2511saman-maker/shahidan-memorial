@@ -44,15 +44,13 @@ const MartyrProfile = () => {
     
     setIsLiked(true);
     try {
-      const { data, error } = await supabase
-        .from('martyrs')
-        .update({ candles_count: (martyr.candles_count || 0) + 1 })
-        .eq('id', martyr.id)
-        .select()
-        .single();
+      // Calling the secure function we just created in SQL
+      const { error } = await supabase.rpc('increment_candles', { target_id: martyr.id });
 
       if (error) throw error;
-      setMartyr(data);
+      
+      // Update local state to show the new count immediately
+      setMartyr({ ...martyr, candles_count: (martyr.candles_count || 0) + 1 });
     } catch (error) {
       console.error('Error updating likes:', error);
       setIsLiked(false);
@@ -134,7 +132,7 @@ const MartyrProfile = () => {
                   <div className="w-10 h-10 rounded-2xl bg-brand-red/10 flex items-center justify-center">
                     <Info size={20} />
                   </div>
-                  کورەی ژیان و خەبات
+                  کورتەی ژیان و خەبات
                 </h2>
                 <div className="text-foreground/80 text-lg md:text-xl leading-[2] md:leading-[2.2] whitespace-pre-line text-justify">
                   {martyr.biography || 'زانیاری دەربارەی ژیاننامەی ئەم شەهیدە هێشتا زیاد نەکراوە.'}
