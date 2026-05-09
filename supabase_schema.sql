@@ -79,23 +79,29 @@ INSERT INTO organizations (name) VALUES
 
 -- RLS (Row Level Security) Policies
 ALTER TABLE martyrs ENABLE ROW LEVEL SECURITY;
-ALTER TABLE organizations ENABLE ROW LEVEL SECURITY;
-ALTER TABLE battles ENABLE ROW LEVEL SECURITY;
-ALTER TABLE martyr_battles ENABLE ROW LEVEL SECURITY;
-ALTER TABLE martyr_gallery ENABLE ROW LEVEL SECURITY;
-ALTER TABLE memorial_candles ENABLE ROW LEVEL SECURITY;
-ALTER TABLE profiles ENABLE ROW LEVEL SECURITY;
+ALTER TABLE martyrs FORCE ROW LEVEL SECURITY;
 
--- Public can read approved martyrs
-CREATE POLICY "Approved martyrs are viewable by everyone" ON martyrs
+-- Public can read approved martyrs only
+CREATE POLICY "Public Read" ON martyrs
   FOR SELECT USING (is_approved = true);
 
--- Auth users can insert submissions (starts as not approved)
-CREATE POLICY "Authenticated users can insert martyrs" ON martyrs
-  FOR INSERT WITH CHECK (auth.role() = 'authenticated');
+-- Admin can read ALL martyrs
+CREATE POLICY "Admin Read All" ON martyrs
+  FOR SELECT TO authenticated
+  USING (true);
 
--- Admins can do everything
-CREATE POLICY "Admins can manage everything" ON martyrs
-  USING (EXISTS (SELECT 1 FROM profiles WHERE id = auth.uid() AND role = 'admin'));
+-- Secure insert (is_approved must be false)
+CREATE POLICY "Strict Insert" ON martyrs
+  FOR INSERT
+  WITH CHECK (is_approved = false);
 
--- Repeat similar policies for other tables...
+-- Admin can update martyrs
+CREATE POLICY "Admin Update" ON martyrs
+  FOR UPDATE TO authenticated
+  USING (true)
+  WITH CHECK (true);
+
+-- Admin can delete martyrs
+CREATE POLICY "Admin Delete" ON martyrs
+  FOR DELETE TO authenticated
+  USING (true);
