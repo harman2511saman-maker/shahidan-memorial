@@ -31,6 +31,7 @@ CREATE TABLE martyrs (
   organization_id UUID REFERENCES organizations(id),
   rank TEXT,
   martyrdom_location TEXT,
+  battles TEXT,
   biography TEXT,
   is_approved BOOLEAN DEFAULT FALSE,
   created_at TIMESTAMP WITH TIME ZONE DEFAULT NOW(),

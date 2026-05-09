@@ -24,11 +24,17 @@ const MartyrCard = ({ martyr }: MartyrCardProps) => {
     >
       <Link href={`/martyr/${martyr.id}`}>
         <div className="relative h-64 overflow-hidden">
-          <img 
-            src={martyr.photo_url || "https://images.unsplash.com/photo-1518770660439-4636190af475?q=80&w=500&auto=format&fit=crop"} 
-            alt={martyr.full_name}
-            className="w-full h-full object-cover group-hover:scale-110 transition-transform duration-500"
-          />
+          {martyr.photo_url ? (
+            <img 
+              src={martyr.photo_url} 
+              alt={martyr.full_name}
+              className="w-full h-full object-cover group-hover:scale-110 transition-transform duration-500"
+            />
+          ) : (
+            <div className="w-full h-full bg-gradient-to-br from-brand-red/20 via-foreground/5 to-brand-green/20 flex items-center justify-center">
+              <span className="text-6xl opacity-20">☆</span>
+            </div>
+          )}
           <div className="absolute inset-0 bg-gradient-to-t from-black/80 via-transparent to-transparent opacity-0 group-hover:opacity-100 transition-opacity" />
           
           <div className="absolute top-4 right-4 bg-brand-red text-white text-xs font-bold px-3 py-1 rounded-full shadow-lg">

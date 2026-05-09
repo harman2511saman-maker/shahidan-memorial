@@ -8,12 +8,15 @@ const Hero = () => {
     <section className="relative h-[80vh] flex items-center justify-center overflow-hidden">
       {/* Background with Overlay using CSS for better stability */}
       <div 
-        className="absolute inset-0 z-0 bg-cover bg-center"
+        className="absolute inset-0 z-0"
         style={{ 
-          backgroundImage: `url('https://images.unsplash.com/photo-1541414779247-5df736565701?q=80&w=2000&auto=format&fit=crop')`,
+          background: `linear-gradient(135deg, #1a0a0a 0%, #0d1f12 30%, #111111 60%, #1a0505 100%)`,
         }}
       >
-        <div className="absolute inset-0 bg-gradient-to-b from-black/70 via-black/40 to-background z-10" />
+        {/* Decorative elements */}
+        <div className="absolute top-20 right-20 w-96 h-96 bg-brand-red/5 rounded-full blur-3xl" />
+        <div className="absolute bottom-20 left-20 w-96 h-96 bg-brand-green/5 rounded-full blur-3xl" />
+        <div className="absolute inset-0 bg-gradient-to-b from-transparent via-transparent to-background z-10" />
       </div>
 
       <div className="container mx-auto px-4 relative z-20 text-center">
