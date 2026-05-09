@@ -10,6 +10,16 @@ const MartyrsGallery = () => {
   const [martyrs, setMartyrs] = useState<any[]>([]);
   const [loading, setLoading] = useState(true);
   const [searchTerm, setSearchTerm] = useState('');
+  const [selectedCategory, setSelectedCategory] = useState<string>('هەمووی');
+
+  const categories = [
+    'هەمووی',
+    'شۆرشی ئەیلوول ١٩٧١',
+    'ڕاپەرینی ١٩٩١',
+    'شەڕی ناوەخۆ ١٩٩٤-١٩٩٨',
+    'شەڕی داعش ٢٠١٤-٢٠١٧',
+    'شەڕی حەشدی شەعبی ٢٠١٧'
+  ];
 
   useEffect(() => {
     fetchMartyrs();
@@ -43,9 +53,14 @@ const MartyrsGallery = () => {
   };
 
   const filteredMartyrs = martyrs.filter(m => {
-    const name = normalizeKurdish(m.full_name);
+    const name = normalizeKurdish(m.full_name || '');
     const search = normalizeKurdish(searchTerm);
-    return name.includes(search);
+    const battles = m.battles || '';
+    
+    const matchesSearch = name.includes(search);
+    const matchesCategory = selectedCategory === 'هەمووی' || battles.includes(selectedCategory);
+    
+    return matchesSearch && matchesCategory;
   });
 
   return (
@@ -59,7 +74,7 @@ const MartyrsGallery = () => {
         </div>
 
         {/* Search */}
-        <div className="max-w-2xl mx-auto mb-16 relative">
+        <div className="max-w-2xl mx-auto mb-8 relative">
           <Search className="absolute right-6 top-1/2 -translate-y-1/2 text-foreground/30" size={24} />
           <input 
             type="text" 
@@ -68,6 +83,23 @@ const MartyrsGallery = () => {
             onChange={(e) => setSearchTerm(e.target.value)}
             className="w-full bg-card border border-border px-16 py-6 rounded-[2rem] text-xl focus:outline-none focus:ring-2 focus:ring-brand-red/20 transition-all shadow-xl"
           />
+        </div>
+
+        {/* Categories Filter */}
+        <div className="flex flex-wrap justify-center gap-3 mb-16 max-w-4xl mx-auto">
+          {categories.map((cat) => (
+            <button
+              key={cat}
+              onClick={() => setSelectedCategory(cat)}
+              className={`px-6 py-3 rounded-2xl font-bold transition-all ${
+                selectedCategory === cat
+                  ? 'bg-brand-red text-white shadow-lg shadow-brand-red/20 scale-105'
+                  : 'bg-card border border-border text-foreground/60 hover:border-brand-red/30'
+              }`}
+            >
+              {cat}
+            </button>
+          ))}
         </div>
 
         {loading ? (

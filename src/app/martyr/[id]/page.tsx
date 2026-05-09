@@ -13,7 +13,6 @@ const MartyrProfile = () => {
   const params = useParams();
   const [martyr, setMartyr] = useState<any>(null);
   const [loading, setLoading] = useState(true);
-  const [isLiked, setIsLiked] = useState(false);
 
   useEffect(() => {
     if (params.id) {
@@ -39,23 +38,6 @@ const MartyrProfile = () => {
     }
   };
 
-  const toggleLike = async () => {
-    if (isLiked) return; 
-    
-    setIsLiked(true);
-    try {
-      // Calling the secure function we just created in SQL
-      const { error } = await supabase.rpc('increment_candles', { target_id: martyr.id });
-
-      if (error) throw error;
-      
-      // Update local state to show the new count immediately
-      setMartyr({ ...martyr, candles_count: (martyr.candles_count || 0) + 1 });
-    } catch (error) {
-      console.error('Error updating likes:', error);
-      setIsLiked(false);
-    }
-  };
 
   if (loading) {
     return (
@@ -141,19 +123,28 @@ const MartyrProfile = () => {
 
               {/* Battles/History Section */}
               {martyr.battles && (
-                <section className="bg-card border border-border p-8 md:p-12 rounded-[2.5rem] md:rounded-[3.5rem] shadow-sm">
-                  <h2 className="text-2xl font-bold mb-8 flex items-center gap-3 text-brand-green">
-                    <div className="w-10 h-10 rounded-2xl bg-brand-green/10 flex items-center justify-center">
+                <section className="bg-card border border-border p-8 md:p-12 rounded-[2.5rem] md:rounded-[3.5rem] shadow-sm relative overflow-hidden">
+                  <div className="absolute bottom-0 left-0 w-48 h-48 bg-brand-red/5 rounded-full -ml-24 -mb-24 blur-3xl" />
+                  <h2 className="text-2xl font-bold mb-8 flex items-center gap-3 text-brand-red">
+                    <div className="w-10 h-10 rounded-2xl bg-brand-red/10 flex items-center justify-center">
                       <History size={20} />
                     </div>
                     داستانەکان و بەشدارییەکان
                   </h2>
-                  <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                  <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                     {martyr.battles.split('،').map((battle: string, i: number) => (
-                      <div key={i} className="flex items-center gap-4 bg-foreground/[0.02] p-5 rounded-2xl border border-border/50">
-                        <div className="w-2 h-2 rounded-full bg-brand-red shrink-0" />
-                        <span className="font-bold text-base md:text-lg">{battle.trim()}</span>
-                      </div>
+                      <motion.div 
+                        key={i}
+                        initial={{ opacity: 0, y: 10 }}
+                        whileInView={{ opacity: 1, y: 0 }}
+                        transition={{ delay: i * 0.1 }}
+                        className="flex items-center gap-4 bg-foreground/[0.03] hover:bg-foreground/[0.05] p-5 rounded-3xl border border-border/50 transition-all group"
+                      >
+                        <div className="w-12 h-12 rounded-2xl bg-white dark:bg-white/5 shadow-sm flex items-center justify-center shrink-0 group-hover:scale-110 transition-transform">
+                          <Award size={20} className="text-brand-red" />
+                        </div>
+                        <span className="font-bold text-lg">{battle.trim()}</span>
+                      </motion.div>
                     ))}
                   </div>
                 </section>
@@ -195,30 +186,16 @@ const MartyrProfile = () => {
                   </div>
                 </div>
 
-                <div className="space-y-4">
-                  <button 
-                    onClick={toggleLike}
-                    className={`group w-full flex flex-col items-center justify-center gap-2 py-6 rounded-[2rem] font-bold transition-all duration-500 ${
-                      isLiked 
-                        ? 'bg-brand-red text-white shadow-2xl shadow-brand-red/30 scale-[1.02]' 
-                        : 'bg-foreground/5 hover:bg-brand-red/10 text-brand-red border border-brand-red/10'
-                    }`}
-                  >
-                    <Heart size={32} fill={isLiked ? "currentColor" : "none"} className={isLiked ? "animate-pulse" : ""} />
-                    <span className="text-lg">داگیرساندنی مۆم ({martyr.candles_count || 0})</span>
-                  </button>
-                  
-                  <button 
-                    onClick={() => {
-                      navigator.clipboard.writeText(window.location.href);
-                      alert('لینکی پڕۆفایل کۆپی کرا');
-                    }}
-                    className="w-full flex items-center justify-center gap-3 py-4 rounded-2xl text-foreground/40 font-bold hover:bg-foreground/5 transition-all border border-transparent hover:border-border"
-                  >
-                    <Share2 size={20} />
-                    <span>بڵاوکردنەوەی پرۆفایل</span>
-                  </button>
-                </div>
+                <button 
+                  onClick={() => {
+                    navigator.clipboard.writeText(window.location.href);
+                    alert('لینکی پڕۆفایل کۆپی کرا');
+                  }}
+                  className="w-full flex items-center justify-center gap-3 py-4 rounded-2xl text-foreground/40 font-bold hover:bg-foreground/5 transition-all border border-transparent hover:border-border"
+                >
+                  <Share2 size={20} />
+                  <span>بڵاوکردنەوەی پرۆفایل</span>
+                </button>
               </div>
             </div>
           </div>

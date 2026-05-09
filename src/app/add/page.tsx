@@ -28,6 +28,24 @@ const AddMartyr = () => {
     biography: ''
   });
   
+  const [selectedBattles, setSelectedBattles] = useState<string[]>([]);
+  
+  const predefinedBattles = [
+    "شۆرشی ئەیلوول ١٩٧١",
+    "ڕاپەرینی ١٩٩١",
+    "شەڕی ناوەخۆ ١٩٩٤-١٩٩٨",
+    "شەڕی داعش ٢٠١٤-٢٠١٧",
+    "شەڕی حەشدی شەعبی ٢٠١٧"
+  ];
+
+  const toggleBattle = (battle: string) => {
+    setSelectedBattles(prev => 
+      prev.includes(battle) 
+        ? prev.filter(b => b !== battle)
+        : [...prev, battle]
+    );
+  };
+  
   const [imageFile, setImageFile] = useState<File | null>(null);
   const [imagePreview, setImagePreview] = useState<string | null>(null);
 
@@ -90,6 +108,7 @@ const AddMartyr = () => {
             organization: formData.organization,
             rank: formData.rank,
             martyrdom_location: formData.martyrdom_location,
+            battles: [...selectedBattles, ...(formData.battles ? formData.battles.split('،').map(b => b.trim()) : [])].filter(Boolean).join('، '),
             biography: formData.biography,
             is_approved: false
           }
@@ -253,9 +272,41 @@ const AddMartyr = () => {
                   </div>
                 </div>
 
-                <div className="space-y-2">
-                  <label className="text-sm font-bold text-foreground/70">ئەو داستانانەی تێیدا بەشداربووە</label>
-                  <textarea name="battles" value={formData.battles} onChange={handleInputChange} rows={3} placeholder="ناوی ئەو شەڕ و داستانانەی بەشداری تێدا کردووە..." className="w-full bg-background border border-border p-4 rounded-xl focus:ring-2 focus:ring-brand-green/50 outline-none resize-none"></textarea>
+                <div className="space-y-4">
+                  <label className="text-sm font-bold text-foreground/70">ئەو داستانانەی تێیدا بەشداربووە (دەتوانیت چەند دانەیەک هەڵبژێریت)</label>
+                  <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
+                    {predefinedBattles.map((battle) => (
+                      <button
+                        key={battle}
+                        type="button"
+                        onClick={() => toggleBattle(battle)}
+                        className={`flex items-center gap-3 p-4 rounded-2xl border transition-all text-right ${
+                          selectedBattles.includes(battle)
+                            ? 'bg-brand-green/10 border-brand-green text-brand-green shadow-sm'
+                            : 'bg-background border-border hover:border-brand-green/30 text-foreground/60'
+                        }`}
+                      >
+                        <div className={`w-5 h-5 rounded-md border flex items-center justify-center transition-all ${
+                          selectedBattles.includes(battle) ? 'bg-brand-green border-brand-green' : 'border-border'
+                        }`}>
+                          {selectedBattles.includes(battle) && <CheckCircle2 size={14} className="text-white" />}
+                        </div>
+                        <span className="font-bold text-sm">{battle}</span>
+                      </button>
+                    ))}
+                  </div>
+                  
+                  <div className="pt-4">
+                    <label className="text-sm font-bold text-foreground/70 mb-2 block">داستانی تر (ئەگەر هەبوو بە فاریزە "،" جیای بکەرەوە)</label>
+                    <textarea 
+                      name="battles" 
+                      value={formData.battles} 
+                      onChange={handleInputChange} 
+                      rows={2} 
+                      placeholder="بۆ نموونە: داستانی سحێلا، داستانی پردێ" 
+                      className="w-full bg-background border border-border p-4 rounded-xl focus:ring-2 focus:ring-brand-green/50 outline-none resize-none"
+                    ></textarea>
+                  </div>
                 </div>
               </motion.div>
             )}
