@@ -78,7 +78,7 @@ const MartyrProfile = () => {
         </div>
       </div>
 
-      <div className="container mx-auto px-4 -mt-16 md:-mt-24 relative z-30">
+      <div className="container mx-auto px-4 mt-6 md:mt-10 relative z-30">
         <div className="max-w-5xl mx-auto">
           {/* Main Info Header */}
           <div className="text-center mb-12 md:mb-16 px-4">
