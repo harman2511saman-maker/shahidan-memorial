@@ -1,7 +1,7 @@
 'use client';
 
 import { useState } from 'react';
-import { supabase } from '@/lib/supabase';
+import { loginAction } from './actions';
 import { motion } from 'framer-motion';
 import { Lock, Mail, Loader2 } from 'lucide-react';
 import { useRouter } from 'next/navigation';
@@ -19,12 +19,9 @@ const LoginPage = () => {
     setError(null);
 
     try {
-      const { error } = await supabase.auth.signInWithPassword({
-        email,
-        password,
-      });
-
-      if (error) throw error;
+      const result = await loginAction(email, password);
+      
+      if (result.error) throw new Error(result.error);
       
       router.push('/portal-manager-yadgari-782');
     } catch (err: any) {

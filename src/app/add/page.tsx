@@ -78,6 +78,16 @@ const AddMartyr = () => {
 
       // 1. Upload Image to Supabase Storage
       if (imageFile) {
+        // Validation: Only allow standard image types
+        if (!['image/jpeg', 'image/png', 'image/webp', 'image/jpg'].includes(imageFile.type)) {
+          throw new Error('تکایە تەنها وێنەی (JPG, PNG, WEBP) بەکاربهێنە بۆ پاراستنی ئاسایش.');
+        }
+
+        // Validation: Max size 5MB
+        if (imageFile.size > 5 * 1024 * 1024) {
+          throw new Error('قەبارەی وێنەکە نابێت لە ٥ مێگابایت زیاتر بێت.');
+        }
+
         const fileExt = imageFile.name.split('.').pop();
         const fileName = `${Math.random()}.${fileExt}`;
         const filePath = `${fileName}`;
